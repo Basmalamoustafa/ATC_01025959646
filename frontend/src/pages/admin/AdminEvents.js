@@ -3,8 +3,10 @@ import API from '../../api';
 import { Table, Button, Container, Spinner, Alert, Pagination } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 const AdminEvents = () => {
+  const { t } = useTranslation();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -19,7 +21,7 @@ const AdminEvents = () => {
       setPages(res.data.pages);
       setPage(res.data.page);
     } catch {
-      toast.error('Failed to load events');
+      toast.error(t('Failed to load events'));
     } finally {
       setLoading(false);
     }
@@ -27,18 +29,19 @@ const AdminEvents = () => {
 
   useEffect(() => {
     fetchEvents(page);
+    // eslint-disable-next-line
   }, [page]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this event?')) return;
+    if (!window.confirm(t('Delete this event?'))) return;
     try {
       await API.delete(`/events/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchEvents(page); // refresh current page
-      toast.success('Event deleted');
+      toast.success(t('Event deleted'));
     } catch {
-      toast.error('Delete failed');
+      toast.error(t('Delete failed'));
     }
   };
 
@@ -60,19 +63,23 @@ const AdminEvents = () => {
 
   if (loading) return <Spinner animation="border" />;
   if (!token || role !== 'admin') {
-    return <Alert variant="danger">Access denied</Alert>;
+    return <Alert variant="danger">{t('Access denied')}</Alert>;
   }
 
   return (
     <Container className="mt-4">
-      <h2>Admin: Manage Events</h2>
+      <h2>{t('Admin: Manage Events')}</h2>
       <Button as={Link} to="/admin/events/new" className="mb-3">
-        + Create New Event
+        + {t('Create New Event')}
       </Button>
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>Name</th><th>Date</th><th>Venue</th><th>Price</th><th>Actions</th>
+            <th>{t('Name')}</th>
+            <th>{t('Date')}</th>
+            <th>{t('Venue')}</th>
+            <th>{t('Price')}</th>
+            <th>{t('Actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -89,14 +96,14 @@ const AdminEvents = () => {
                   to={`/admin/events/${evt._id}/edit`}
                   className="me-2"
                 >
-                  Edit
+                  {t('Edit')}
                 </Button>
                 <Button
                   size="sm"
                   variant="danger"
                   onClick={() => handleDelete(evt._id)}
                 >
-                  Delete
+                  {t('Delete')}
                 </Button>
               </td>
             </tr>

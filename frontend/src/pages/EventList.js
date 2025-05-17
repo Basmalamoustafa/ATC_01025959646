@@ -5,8 +5,10 @@ import {
 } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 const EventList = () => {
+  const { t } = useTranslation();
   const [events, setEvents] = useState([]);
   const [userBookings, setUserBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,18 +38,19 @@ const EventList = () => {
         }
       } catch (err) {
         console.error(err);
-        setError('Failed to load data.');
-        toast.error('Failed to load data.');
+        setError(t('Failed to load data.'));
+        toast.error(t('Failed to load data.'));
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [token, page]);
+    // eslint-disable-next-line
+  }, [token, page, t]);
 
   const handleBook = async (eventId) => {
     if (!token) {
-      toast.info('Please log in to book events.');
+      toast.info(t('Please log in to book events.'));
       navigate('/login');
       return;
     }
@@ -60,7 +63,7 @@ const EventList = () => {
         { eventId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success('Booked successfully!');
+      toast.success(t('Booked successfully!'));
 
       const bookingRes = await API.get('/bookings/my', {
         headers: { Authorization: `Bearer ${token}` },
@@ -71,7 +74,7 @@ const EventList = () => {
       navigate('/congratulations', { state: { event: bookedEvent } });
     } catch (err) {
       console.error('Booking failed:', err);
-      toast.error(err.response?.data?.msg || 'Booking failed.');
+      toast.error(err.response?.data?.msg || t('Booking failed.'));
     } finally {
       setBookingId(null);
     }
@@ -107,28 +110,29 @@ const EventList = () => {
     setSelectedEvent(null);
   };
 
+  // Detect dark mode by checking the body class
+  const isDarkMode = document.body.classList.contains('dark-mode');
+
   if (loading) return <Spinner animation="border" />;
   if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
     <Container className="mt-4">
-      <h3 className="mb-3">Browse Events</h3>
-
+      <h3 className="mb-3">{t("Browse Events")}</h3>
       <Form.Group className="mb-4" controlId="categorySelect">
-        <Form.Label>Filter by Category</Form.Label>
+        <Form.Label>{t("Filter by Category")}</Form.Label>
         <Form.Select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
           {uniqueCategories.map((cat, idx) => (
-            <option key={idx} value={cat}>{cat}</option>
+            <option key={idx} value={cat}>{t(cat)}</option>
           ))}
         </Form.Select>
       </Form.Group>
-
       <Row xs={1} sm={2} md={3} lg={4} className="g-4">
         {filteredEvents.length === 0 ? (
-          <p>No events found for this category.</p>
+          <p>{t("No events found for this category.")}</p>
         ) : (
           filteredEvents.map(evt => {
             const isBooked = userBookings.some(
@@ -151,12 +155,12 @@ const EventList = () => {
                     <Card.Text className="text-truncate">{evt.description}</Card.Text>
                     <Card.Text>
                       <small className="text-muted">
-                        {new Date(evt.date).toLocaleString()} at {evt.venue}
+                        {new Date(evt.date).toLocaleString()} {t("at")} {evt.venue}
                       </small>
                     </Card.Text>
                     <Card.Text><strong>${evt.price}</strong></Card.Text>
                     <Card.Text>
-                      <strong>Category:</strong> {evt.category}
+                      <strong>{t("Category")}:</strong> {evt.category}
                     </Card.Text>
                     <Card.Text>
                       {evt.tags.map(tag => (
@@ -167,7 +171,7 @@ const EventList = () => {
                     <div onClick={e => e.stopPropagation()}>
                       {isBooked ? (
                         <Button variant="danger" block disabled>
-                          Booked
+                          {t("Booked")}
                         </Button>
                       ) : (
                         <Button
@@ -184,10 +188,10 @@ const EventList = () => {
                                 size="sm"
                                 role="status"
                                 aria-hidden="true"
-                              /> Booking...
+                              /> {t("Booking...")}
                             </>
                           ) : (
-                            'Book Now'
+                            t("Book Now")
                           )}
                         </Button>
                       )}
@@ -205,6 +209,7 @@ const EventList = () => {
         show={showModal}
         onHide={handleCloseModal}
         centered
+        dialogClassName={isDarkMode ? 'dark-mode' : ''}
       >
         <Modal.Header closeButton>
           <Modal.Title>{selectedEvent?.name}</Modal.Title>
@@ -217,13 +222,13 @@ const EventList = () => {
                 alt={selectedEvent.name}
                 style={{ width: '100%', height: 200, objectFit: 'cover', marginBottom: 16 }}
               />
-              <p><strong>Description:</strong> {selectedEvent.description}</p>
-              <p><strong>Date:</strong> {new Date(selectedEvent.date).toLocaleString()}</p>
-              <p><strong>Venue:</strong> {selectedEvent.venue}</p>
-              <p><strong>Price:</strong> ${selectedEvent.price}</p>
-              <p><strong>Category:</strong> {selectedEvent.category}</p>
+              <p><strong>{t("Description")}:</strong> {selectedEvent.description}</p>
+              <p><strong>{t("Date")}:</strong> {new Date(selectedEvent.date).toLocaleString()}</p>
+              <p><strong>{t("Venue")}:</strong> {selectedEvent.venue}</p>
+              <p><strong>{t("Price")}:</strong> ${selectedEvent.price}</p>
+              <p><strong>{t("Category")}:</strong> {selectedEvent.category}</p>
               <p>
-                <strong>Tags:</strong>{' '}
+                <strong>{t("Tags")}:</strong>{' '}
                 {selectedEvent.tags.map(tag => (
                   <Badge key={tag} bg="secondary" className="me-1">{tag}</Badge>
                 ))}
@@ -233,7 +238,7 @@ const EventList = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
-            Close
+            {t("Close")}
           </Button>
         </Modal.Footer>
       </Modal>

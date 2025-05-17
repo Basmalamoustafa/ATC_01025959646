@@ -2,20 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { Card, Container, Row, Col, Alert, Button } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import API from '../api';
+import { useTranslation } from 'react-i18next';
 
 const MyBookings = () => {
+  const { t } = useTranslation();
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
     fetchBookings();
+    // eslint-disable-next-line
   }, []);
 
   const fetchBookings = async () => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
-        toast.error('Please log in to view your bookings.');
+        toast.error(t('Please log in to view your bookings.'));
         return;
       }
 
@@ -25,37 +28,36 @@ const MyBookings = () => {
       setBookings(res.data);
     } catch (err) {
       console.error('Failed to fetch bookings:', err);
-      const msg = err.response?.data?.msg || 'Failed to fetch bookings.';
+      const msg = err.response?.data?.msg || t('Failed to fetch bookings.');
       setError(msg);
       toast.error(msg);
     }
   };
 
   const handleDelete = async (bookingId) => {
-    if (!window.confirm('Are you sure you want to delete this booking?')) return;
+    if (!window.confirm(t('Are you sure you want to delete this booking?'))) return;
 
     try {
       const token = localStorage.getItem('authToken');
       await API.delete(`/bookings/${bookingId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success('Booking deleted successfully.');
-      // Remove deleted booking from state
+      toast.success(t('Booking deleted successfully.'));
       setBookings(bookings.filter((b) => b._id !== bookingId));
     } catch (err) {
       console.error('Failed to delete booking:', err);
-      const msg = err.response?.data?.msg || 'Failed to delete booking.';
+      const msg = err.response?.data?.msg || t('Failed to delete booking.');
       toast.error(msg);
     }
   };
 
   return (
     <Container className="mt-4">
-      <h2 className="mb-4">Your Bookings</h2>
+      <h2 className="mb-4">{t('Your Bookings')}</h2>
       {error && <Alert variant="danger">{error}</Alert>}
 
       {bookings.length === 0 && !error ? (
-        <Alert variant="info">You haven't booked any events yet.</Alert>
+        <Alert variant="info">{t("You haven't booked any events yet.")}</Alert>
       ) : (
         <Row>
           {bookings.map((booking) => {
@@ -65,15 +67,15 @@ const MyBookings = () => {
                 <Col md={6} lg={4} key={booking._id} className="mb-4">
                   <Card border="danger">
                     <Card.Body>
-                      <Card.Title>Event no longer exists</Card.Title>
+                      <Card.Title>{t('Event no longer exists')}</Card.Title>
                       <Card.Text>
-                        The event you booked has been deleted by the admin.
+                        {t('The event you booked has been deleted by the admin.')}
                       </Card.Text>
                       <Button
                         variant="danger"
                         onClick={() => handleDelete(booking._id)}
                       >
-                        Delete Booking
+                        {t('Delete Booking')}
                       </Button>
                     </Card.Body>
                   </Card>
@@ -94,9 +96,9 @@ const MyBookings = () => {
                   <Card.Body>
                     <Card.Title>{booking.event.name}</Card.Title>
                     <Card.Text>{booking.event.description}</Card.Text>
-                    <p><strong>Venue:</strong> {booking.event.venue}</p>
-                    <p><strong>Date:</strong> {new Date(booking.event.date).toLocaleString()}</p>
-                    <p><strong>Price:</strong> ${booking.event.price}</p>
+                    <p><strong>{t('Venue')}:</strong> {booking.event.venue}</p>
+                    <p><strong>{t('Date')}:</strong> {new Date(booking.event.date).toLocaleString()}</p>
+                    <p><strong>{t('Price')}:</strong> ${booking.event.price}</p>
                   </Card.Body>
                 </Card>
               </Col>

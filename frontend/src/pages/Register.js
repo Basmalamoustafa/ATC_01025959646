@@ -3,8 +3,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Form, Card, Button, Alert, Container, Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import API from '../api';
+import { useTranslation } from 'react-i18next';
 
 const Register = () => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'user' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,15 +23,15 @@ const Register = () => {
     try {
       const res = await API.post('/auth/register', form);
       localStorage.setItem('authToken', res.data.token);
-      localStorage.setItem('userRole', form.role); // Store the role in localStorage
-      toast.success('Account created successfully!');
+      localStorage.setItem('userRole', form.role);
+      toast.success(t('Account created successfully!'));
       if (form.role === 'admin') {
-        navigate('/admin/events'); // Redirect to the admin panel if the role is admin
+        navigate('/admin/events');
       } else {
         navigate('/');
       }
     } catch (err) {
-      const msg = err.response?.data?.msg || 'Registration failed';
+      const msg = err.response?.data?.msg || t('Registration failed');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -40,35 +42,35 @@ const Register = () => {
   return (
     <Container style={{ maxWidth: 400, marginTop: '2rem' }}>
       <Card className="p-4">
-        <h2 className="mb-4 text-center">Create Account</h2>
+        <h2 className="mb-4 text-center">{t('Create Account')}</h2>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="registerName">
-            <Form.Label>Name</Form.Label>
+            <Form.Label>{t('Name')}</Form.Label>
             <Form.Control
               type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
               required
-              placeholder="Enter your name"
+              placeholder={t('Enter your name')}
             />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="registerEmail">
-            <Form.Label>Email</Form.Label>
+            <Form.Label>{t('Email')}</Form.Label>
             <Form.Control
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
               required
-              placeholder="Enter your email"
+              placeholder={t('Enter your email')}
             />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="registerPassword">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>{t('Password')}</Form.Label>
             <Form.Control
               type="password"
               name="password"
@@ -76,17 +78,18 @@ const Register = () => {
               onChange={handleChange}
               required
               minLength={6}
-              placeholder="Choose a strong password"
+              placeholder={t('Choose a strong password')}
             />
           </Form.Group>
 
           <Button type="submit" className="w-100" disabled={loading}>
-            {loading ? <Spinner animation="border" size="sm" /> : 'Register'}
+            {loading ? <Spinner animation="border" size="sm" /> : t('Register')}
           </Button>
         </Form>
 
         <div className="mt-3 text-center">
-          Already have an account? <Link to="/login">Log In</Link>
+          {t('Already have an account?')}{' '}
+          <Link to="/login">{t('Log In')}</Link>
         </div>
       </Card>
     </Container>

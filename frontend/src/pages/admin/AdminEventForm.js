@@ -4,8 +4,10 @@ import { Form, Container, Button, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 
 const AdminEventForm = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const [form, setForm] = useState({
@@ -24,8 +26,9 @@ const AdminEventForm = () => {
         date: res.data.date.slice(0, 16),
         tags: Array.isArray(res.data.tags) ? res.data.tags.join(', ') : res.data.tags || ''
       }))
-      .catch(() => toast.error('Failed to load event'))
+      .catch(() => toast.error(t('Failed to load event')))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line
   }, [id, isEdit]);
 
   const handleChange = e => {
@@ -38,7 +41,7 @@ const AdminEventForm = () => {
     if (typeof submitForm.tags === 'string') {
       submitForm.tags = submitForm.tags
         .split(',')
-        .map(t => t.trim())
+        .map(tg => tg.trim())
         .filter(Boolean);
     }
     try {
@@ -46,16 +49,16 @@ const AdminEventForm = () => {
         await API.put(`/events/${id}`, submitForm, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success('Event updated');
+        toast.success(t('Event updated'));
       } else {
         await API.post('/events', submitForm, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success('Event created');
+        toast.success(t('Event created'));
       }
       navigate('/admin/events');
     } catch (err) {
-      toast.error(err.response?.data?.msg || 'Save failed');
+      toast.error(err.response?.data?.msg || t('Save failed'));
     }
   };
 
@@ -74,9 +77,9 @@ const AdminEventForm = () => {
         }
       });
       setForm(f => ({ ...f, image: res.data.imageUrl }));
-      toast.success('Image uploaded');
+      toast.success(t('Image uploaded'));
     } catch (err) {
-      toast.error('Image upload failed');
+      toast.error(t('Image upload failed'));
     }
   };
 
@@ -89,16 +92,16 @@ const AdminEventForm = () => {
   if (loading) return <Spinner animation="border" />;
 
   if (!token || localStorage.getItem('userRole') !== 'admin') {
-    return <Alert variant="danger">Access denied</Alert>;
+    return <Alert variant="danger">{t('Access denied')}</Alert>;
   }
 
   return (
     <Container style={{ maxWidth: 600, marginTop: '2rem' }}>
-      <h2>{isEdit ? 'Edit Event' : 'Create New Event'}</h2>
+      <h2>{isEdit ? t('Edit Event') : t('Create New Event')}</h2>
       <Form onSubmit={handleSubmit}>
         {['name', 'category', 'venue'].map(field => (
           <Form.Group className="mb-3" key={field}>
-            <Form.Label>{field.charAt(0).toUpperCase() + field.slice(1)}</Form.Label>
+            <Form.Label>{t(field.charAt(0).toUpperCase() + field.slice(1))}</Form.Label>
             <Form.Control
               name={field}
               value={form[field]}
@@ -108,7 +111,7 @@ const AdminEventForm = () => {
           </Form.Group>
         ))}
         <Form.Group className="mb-3">
-          <Form.Label>Description</Form.Label>
+          <Form.Label>{t('Description')}</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
@@ -118,7 +121,7 @@ const AdminEventForm = () => {
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Date & Time</Form.Label>
+          <Form.Label>{t('Date & Time')}</Form.Label>
           <Form.Control
             type="datetime-local"
             name="date"
@@ -128,7 +131,7 @@ const AdminEventForm = () => {
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Price</Form.Label>
+          <Form.Label>{t('Price')}</Form.Label>
           <Form.Control
             type="number"
             name="price"
@@ -141,7 +144,7 @@ const AdminEventForm = () => {
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Tags (comma separated)</Form.Label>
+          <Form.Label>{t('Tags (comma separated)')}</Form.Label>
           <Form.Control
             name="tags"
             value={Array.isArray(form.tags) ? form.tags.join(', ') : form.tags || ''}
@@ -151,12 +154,12 @@ const AdminEventForm = () => {
                 tags: e.target.value
               }))
             }
-            placeholder="e.g. music, live, outdoor"
+            placeholder={t('e.g. music, live, outdoor')}
           />
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Event Image</Form.Label>
+          <Form.Label>{t('Event Image')}</Form.Label>
           <div
             {...getRootProps({
               className: 'dropzone border p-3 text-center',
@@ -172,13 +175,13 @@ const AdminEventForm = () => {
             {form.image ? (
               <img src={form.image} alt="Uploaded" style={{ maxWidth: '100%', maxHeight: 200 }} />
             ) : (
-              <p>Drag & drop an image here, or click to select</p>
+              <p>{t('Drag & drop an image here, or click to select')}</p>
             )}
           </div>
         </Form.Group>
 
         <Button type="submit">
-          {isEdit ? 'Update Event' : 'Create Event'}
+          {isEdit ? t('Update Event') : t('Create Event')}
         </Button>
       </Form>
     </Container>

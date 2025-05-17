@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-
 import AppNavbar from './components/Navbar';
 import EventList from './pages/EventList';
 import LoginPage from './pages/LoginPage';
@@ -10,14 +9,14 @@ import AdminEvents from './pages/admin/AdminEvents';
 import AdminEventForm from './pages/admin/AdminEventForm';
 import AdminUsers from './pages/admin/AdminUsers';
 import Congratulations from './pages/Congratulations';
-
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 import useDarkMode from './hooks/useDarkMode';
+import { useTranslation } from 'react-i18next';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useDarkMode();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     if (isDarkMode) {
@@ -26,6 +25,11 @@ function App() {
       document.body.classList.remove('dark-mode');
     }
   }, [isDarkMode]);
+
+  // RTL support for Arabic
+  useEffect(() => {
+    document.body.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+  }, [i18n.language]);
 
   return (
     <Router>

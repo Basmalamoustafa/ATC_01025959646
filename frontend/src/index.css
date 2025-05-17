@@ -126,3 +126,37 @@ button, .btn {
   border-color: #444 !important;
   color: #f1f1f1 !important;
 }
+
+body[dir="rtl"] .dropdown-menu {
+  right: 0 !important;
+  left: auto !important;
+  text-align: right;
+  min-width: 100% !important;
+  width: max-content;
+  box-sizing: border-box;
+}
+body[dir="rtl"] select,
+body[dir="rtl"] .form-select {
+  background-position: left 0.75rem center !important;
+  padding-right: 0.75rem !important;
+  padding-left: 2.25rem !important;
+}
+
+/* RTL select width fix for dropdown visibility */
+body[dir="rtl"] .form-select {
+  width: 250px !important;
+  min-width: 200px !important;
+}
+body[dir="ltr"] .form-select {
+  width: 250px !important;
+  min-width: 200px !important;
+  text-align: left;
+  direction: ltr;
+}
+
+body[dir="rtl"] .navbar .btn-logout,
+body[dir="rtl"] .navbar .logout-btn,
+body[dir="rtl"] .navbar .btn-register {
+  margin-left: 0.5rem !important;
+  margin-right: 0.5rem !important;
+}
