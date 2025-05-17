@@ -46,7 +46,6 @@ A full-stack web application for browsing, booking, and managing events. Users c
 
 ### Installation
 
-```bash
 # Clone the repo
 git clone https://github.com/Basmalamoustafa/ATC_01025959646
 cd event-booking-system
@@ -58,3 +57,47 @@ npm install
 # Install frontend dependencies
 cd ../frontend
 npm install
+
+###Development
+
+Start Backend
+cd backend
+npm run dev
+Start Frontend
+cd ../frontend
+npm start
+Frontend: http://localhost:3000
+Backend API: http://localhost:5001/api
+Testing
+
+cd backend
+npm test
+Uses Jest & Supertest
+Tests are located in backend/tests/
+Deployment
+
+The app is deployed at:
+https://event-booker-weou.onrender.com
+
+
+###Folder Structure
+event-booking-system/
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── server.js
+│   ├── uploads/        # Uploaded images
+│   ├── tests/          # Jest & Supertest
+│   ├── package.json
+│   └── jest.config.js
+└── frontend/
+    ├── src/
+    │   ├── components/
+    │   ├── hooks/
+    │   ├── pages/
+    │   └── api.js
+    ├── public/
+    └── package.json
