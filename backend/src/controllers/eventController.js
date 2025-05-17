@@ -1,4 +1,3 @@
-// backend/src/controllers/eventController.js
 const Event = require('../models/Event');
 
 // @desc   Get all events
@@ -29,36 +28,67 @@ exports.getEvents = async (req, res) => {
   }
 };
 
-
 // @desc   Get single event
 // @route  GET /api/events/:id
 // @access Public
 exports.getEvent = async (req, res) => {
-  const event = await Event.findById(req.params.id);
-  if (!event) return res.status(404).json({ msg: 'Event not found' });
-  res.json(event);
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ msg: 'Event not found' });
+    res.json(event);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error', error: err.message });
+  }
 };
 
 // @desc   Create new event
 // @route  POST /api/events
 // @access Admin
 exports.createEvent = async (req, res) => {
-  const newEvent = await Event.create(req.body);
-  res.status(201).json(newEvent);
+  try {
+    const { tags, ...rest } = req.body;
+    // Accept tags as array or comma-separated string
+    const tagsArray = Array.isArray(tags)
+      ? tags
+      : typeof tags === 'string'
+        ? tags.split(',').map(t => t.trim()).filter(Boolean)
+        : [];
+    const newEvent = await Event.create({ ...rest, tags: tagsArray });
+    res.status(201).json(newEvent);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error', error: err.message });
+  }
 };
 
 // @desc   Update event
 // @route  PUT /api/events/:id
 // @access Admin
 exports.updateEvent = async (req, res) => {
-  const updated = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(updated);
+  try {
+    const { tags, ...rest } = req.body;
+    const tagsArray = Array.isArray(tags)
+      ? tags
+      : typeof tags === 'string'
+        ? tags.split(',').map(t => t.trim()).filter(Boolean)
+        : undefined;
+    const updateData = tagsArray !== undefined ? { ...rest, tags: tagsArray } : rest;
+    const updated = await Event.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!updated) return res.status(404).json({ msg: 'Event not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error', error: err.message });
+  }
 };
 
 // @desc   Delete event
 // @route  DELETE /api/events/:id
 // @access Admin
 exports.deleteEvent = async (req, res) => {
-  await Event.findByIdAndDelete(req.params.id);
-  res.json({ msg: 'Event deleted' });
+  try {
+    const deleted = await Event.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ msg: 'Event not found' });
+    res.json({ msg: 'Event deleted' });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error', error: err.message });
+  }
 };

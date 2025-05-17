@@ -10,7 +10,7 @@ const AdminEventForm = () => {
   const isEdit = Boolean(id);
   const [form, setForm] = useState({
     name: '', description: '', category: '',
-    date: '', venue: '', price: '', image: ''
+    date: '', venue: '', price: '', image: '', tags: ''
   });
   const [loading, setLoading] = useState(isEdit);
   const navigate = useNavigate();
@@ -21,7 +21,8 @@ const AdminEventForm = () => {
     API.get(`/events/${id}`)
       .then(res => setForm({
         ...res.data,
-        date: res.data.date.slice(0, 16)
+        date: res.data.date.slice(0, 16),
+        tags: Array.isArray(res.data.tags) ? res.data.tags.join(', ') : res.data.tags || ''
       }))
       .catch(() => toast.error('Failed to load event'))
       .finally(() => setLoading(false));
@@ -33,14 +34,21 @@ const AdminEventForm = () => {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    let submitForm = { ...form };
+    if (typeof submitForm.tags === 'string') {
+      submitForm.tags = submitForm.tags
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
+    }
     try {
       if (isEdit) {
-        await API.put(`/events/${id}`, form, {
+        await API.put(`/events/${id}`, submitForm, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Event updated');
       } else {
-        await API.post('/events', form, {
+        await API.post('/events', submitForm, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Event created');
@@ -129,6 +137,21 @@ const AdminEventForm = () => {
             required
             min="0"
             step="0.01"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Tags (comma separated)</Form.Label>
+          <Form.Control
+            name="tags"
+            value={Array.isArray(form.tags) ? form.tags.join(', ') : form.tags || ''}
+            onChange={e =>
+              setForm(f => ({
+                ...f,
+                tags: e.target.value
+              }))
+            }
+            placeholder="e.g. music, live, outdoor"
           />
         </Form.Group>
 

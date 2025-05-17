@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import API from '../api';
 import {
-  Container, Row, Col, Card, Button, Spinner, Alert, Pagination, Badge, Form
+  Container, Row, Col, Card, Button, Spinner, Alert, Pagination, Badge, Form, Modal
 } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -15,6 +15,9 @@ const EventList = () => {
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
 
@@ -94,6 +97,16 @@ const EventList = () => {
     ? events
     : events.filter(e => e.category === selectedCategory);
 
+  const handleCardClick = (evt) => {
+    setSelectedEvent(evt);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedEvent(null);
+  };
+
   if (loading) return <Spinner animation="border" />;
   if (error) return <Alert variant="danger">{error}</Alert>;
 
@@ -124,7 +137,10 @@ const EventList = () => {
 
             return (
               <Col key={evt._id}>
-                <Card>
+                <Card
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => handleCardClick(evt)}
+                >
                   <Card.Img
                     variant="top"
                     src={evt.image}
@@ -147,33 +163,35 @@ const EventList = () => {
                         <Badge key={tag} bg="secondary" className="me-1">{tag}</Badge>
                       ))}
                     </Card.Text>
-
-                    {isBooked ? (
-                      <Button variant="danger" block disabled>
-                        Booked
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() => handleBook(evt._id)}
-                        block
-                        variant="primary"
-                        disabled={bookingId === evt._id}
-                      >
-                        {bookingId === evt._id ? (
-                          <>
-                            <Spinner
-                              as="span"
-                              animation="border"
-                              size="sm"
-                              role="status"
-                              aria-hidden="true"
-                            /> Booking...
-                          </>
-                        ) : (
-                          'Book Now'
-                        )}
-                      </Button>
-                    )}
+                    {/* Prevent card click from triggering when clicking the button */}
+                    <div onClick={e => e.stopPropagation()}>
+                      {isBooked ? (
+                        <Button variant="danger" block disabled>
+                          Booked
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => handleBook(evt._id)}
+                          block
+                          variant="primary"
+                          disabled={bookingId === evt._id}
+                        >
+                          {bookingId === evt._id ? (
+                            <>
+                              <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                              /> Booking...
+                            </>
+                          ) : (
+                            'Book Now'
+                          )}
+                        </Button>
+                      )}
+                    </div>
                   </Card.Body>
                 </Card>
               </Col>
@@ -181,6 +199,44 @@ const EventList = () => {
           })
         )}
       </Row>
+
+      {/* Modal for event details */}
+      <Modal
+        show={showModal}
+        onHide={handleCloseModal}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{selectedEvent?.name}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedEvent && (
+            <>
+              <img
+                src={selectedEvent.image}
+                alt={selectedEvent.name}
+                style={{ width: '100%', height: 200, objectFit: 'cover', marginBottom: 16 }}
+              />
+              <p><strong>Description:</strong> {selectedEvent.description}</p>
+              <p><strong>Date:</strong> {new Date(selectedEvent.date).toLocaleString()}</p>
+              <p><strong>Venue:</strong> {selectedEvent.venue}</p>
+              <p><strong>Price:</strong> ${selectedEvent.price}</p>
+              <p><strong>Category:</strong> {selectedEvent.category}</p>
+              <p>
+                <strong>Tags:</strong>{' '}
+                {selectedEvent.tags.map(tag => (
+                  <Badge key={tag} bg="secondary" className="me-1">{tag}</Badge>
+                ))}
+              </p>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <div className="d-flex justify-content-center mt-4">
         {renderPagination()}
