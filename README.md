@@ -58,6 +58,8 @@ npm install
 cd ../frontend
 npm install
 
+___
+
 ###Development
 
 Start Backend
@@ -78,7 +80,7 @@ Deployment
 
 The app is deployed at:
 https://event-booker-weou.onrender.com
-
+___
 
 ###Folder Structure
 
