@@ -26,18 +26,23 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes); // ✅ Use upload route
 
-// Server and DB setup
-const PORT = process.env.PORT || 5001;
-const MONGO_URI = process.env.MONGO_URI;
+// Export app for testing
+module.exports = app;
 
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
-    console.log('✅ Connected to MongoDB');
-    app.listen(PORT, () =>
-      console.log(`🚀 Server running on http://localhost:${PORT}`)
-    );
-  })
-  .catch((err) => {
-    console.error('❌ MongoDB connection error:', err);
-  });
+// If not in test environment, connect DB and start server
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 5001;
+  const MONGO_URI = process.env.MONGO_URI;
+
+  mongoose
+    .connect(MONGO_URI)
+    .then(() => {
+      console.log('✅ Connected to MongoDB');
+      app.listen(PORT, () =>
+        console.log(`🚀 Server running on http://localhost:${PORT}`)
+      );
+    })
+    .catch((err) => {
+      console.error('❌ MongoDB connection error:', err);
+    });
+}

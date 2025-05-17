@@ -80,26 +80,25 @@ exports.promoteUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Prevent self-demotion (Admin cannot demote themselves)
     if (req.user.id === id) {
       return res.status(400).json({ msg: "You’re already an admin!" });
     }
 
-    // Find the user by ID and promote to admin
     const user = await User.findByIdAndUpdate(
       id,
       { role: 'admin' },
-      { new: true } // Return the updated user document
-    ).select('-password'); // Exclude the password field
+      { new: true }
+    );
 
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
 
-    // Return a success message and the updated user
+    // Remove password field if present
+    if (user.password) user.password = undefined;
+
     res.json({ msg: `${user.email} is now an admin.`, user });
   } catch (err) {
-    // Handle any errors
     res.status(500).json({ error: err.message });
   }
 };

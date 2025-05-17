@@ -1,29 +1,33 @@
-// frontend/src/pages/admin/AdminEvents.js
 import React, { useEffect, useState } from 'react';
 import API from '../../api';
-import { Table, Button, Container, Spinner, Alert } from 'react-bootstrap';
+import { Table, Button, Container, Spinner, Alert, Pagination } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const AdminEvents = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
   const token = localStorage.getItem('authToken');
   const role  = localStorage.getItem('userRole');
 
+  const fetchEvents = async (pageNum = 1) => {
+    try {
+      const res = await API.get(`/events?page=${pageNum}&limit=10`);
+      setEvents(res.data.events);
+      setPages(res.data.pages);
+      setPage(res.data.page);
+    } catch {
+      toast.error('Failed to load events');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await API.get('/events');
-        setEvents(res.data.events); // ✅ fix: use res.data.events not res.data
-      } catch {
-        toast.error('Failed to load events');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
+    fetchEvents(page);
+  }, [page]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this event?')) return;
@@ -31,12 +35,28 @@ const AdminEvents = () => {
       await API.delete(`/events/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setEvents(ev => ev.filter(e => e._id !== id));
+      fetchEvents(page); // refresh current page
       toast.success('Event deleted');
     } catch {
       toast.error('Delete failed');
     }
   };
+
+  const renderPagination = () => (
+    <div className="d-flex justify-content-center mt-3">
+      <Pagination>
+        {[...Array(pages).keys()].map((x) => (
+          <Pagination.Item
+            key={x + 1}
+            active={x + 1 === page}
+            onClick={() => setPage(x + 1)}
+          >
+            {x + 1}
+          </Pagination.Item>
+        ))}
+      </Pagination>
+    </div>
+  );
 
   if (loading) return <Spinner animation="border" />;
   if (!token || role !== 'admin') {
@@ -56,7 +76,7 @@ const AdminEvents = () => {
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(events) && events.map(evt => (
+          {events.map(evt => (
             <tr key={evt._id}>
               <td>{evt.name}</td>
               <td>{new Date(evt.date).toLocaleDateString()}</td>
@@ -83,6 +103,7 @@ const AdminEvents = () => {
           ))}
         </tbody>
       </Table>
+      {pages > 1 && renderPagination()}
     </Container>
   );
 };

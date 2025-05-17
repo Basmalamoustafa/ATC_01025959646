@@ -21,3 +21,63 @@ button, .btn {
   padding-bottom: 20px;
 }
 
+.dark-mode {
+  background-color: #181a1b !important;
+  color: #f1f1f1 !important;
+}
+
+.dark-mode .card {
+  background-color: #23272b;
+  color: #f1f1f1;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.dark-mode .container {
+  background-color: transparent;
+}
+
+.dark-mode .btn,
+.dark-mode button {
+  background-color: #343a40;
+  color: #f1f1f1;
+  border-color: #444;
+}
+
+.dark-mode .btn-primary {
+  background-color: #375a7f;
+  border-color: #375a7f;
+}
+
+.dark-mode .btn-outline-primary {
+  color: #f1f1f1;
+  border-color: #f1f1f1;
+}
+
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+  background-color: #23272b;
+  color: #f1f1f1;
+  border-color: #444;
+}
+
+.dark-mode .table,
+.dark-mode .table th,
+.dark-mode .table td {
+  background-color: #181a1b !important;
+  color: #f1f1f1 !important;
+}
+
+.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #23272b !important;
+}
+
+.dark-mode .table-striped > tbody > tr:nth-of-type(even) {
+  background-color: #181a1b !important;
+}
+
+.dark-mode .table-bordered,
+.dark-mode .table-bordered th,
+.dark-mode .table-bordered td {
+  border-color: #444 !important;
+}
