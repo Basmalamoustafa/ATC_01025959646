@@ -6,33 +6,36 @@ A full-stack web application for browsing, booking, and managing events. Users c
 
 ## Features
 
-- **User Authentication**
+- **User Authentication**  
   - JWT-based registration & login  
   - Role-based access: `user` vs. `admin`  
 
-- **Event Browsing & Booking**
+- **Event Browsing & Booking**  
   - Public event listings with pagination, categories & tags  
   - “Book Now” button (per-button loading state)  
   - Permanently marked “Booked” events  
   - Congratulations screen upon successful booking  
 
-- **Admin Panel**
-  - Create / edit / delete events (including image upload via drag‑and‑drop)  
+- **Admin Panel**  
+  - Create / edit / delete events (including image upload via drag-and-drop)  
   - View & promote users to admin  
   - Paginated event management table  
 
-- **File Uploads**
-  - Multer‑powered image uploads  
+- **File Uploads**  
+  - Multer-powered image uploads  
   - Static serving of uploaded images  
 
-- **Responsive & Accessible UI**
-  - React + React‑Bootstrap  
+- **Responsive & Accessible UI**  
+  - React + React-Bootstrap  
   - Dark mode toggle (hook + CSS)  
-  - Toast notifications via React‑Toastify  
+  - Toast notifications via React-Toastify  
 
-- **API Tests**
+- **Internationalization**  
+  - English & Arabic (RTL) support via `react-i18next`  
+
+- **API Tests**  
   - Jest & Supertest covering auth, booking, event, and user controllers  
-  - In‑memory or sandboxed test DB  
+  - In-memory or sandboxed test DB  
 
 ---
 
@@ -46,44 +49,72 @@ A full-stack web application for browsing, booking, and managing events. Users c
 
 ### Installation
 
-# Clone the repo
-git clone https://github.com/Basmalamoustafa/ATC_01025959646
-cd event-booking-system
+1. **Clone the repo**  
+   ```bash
+   git clone https://github.com/Basmalamoustafa/ATC_01025959646
+   cd event-booking-system
 
-# Install backend dependencies
-cd backend
-npm install
+2. **Install backend dependencies**
+   ```bash
+   cd backend
+   npm install
 
-# Install frontend dependencies
-cd ../frontend
-npm install
+3. **Install frontend dependencies**
+   ```bash
+   cd frontend
+   npm install
 
-___
+---
 
-###Development
+## Development
 
-Start Backend
-cd backend
-npm run dev
-Start Frontend
-cd ../frontend
-npm start
-Frontend: http://localhost:3000
-Backend API: http://localhost:5001/api
-Testing
+### Start Backend
 
-cd backend
-npm test
-Uses Jest & Supertest
-Tests are located in backend/tests/
-Deployment
+1.  ```bash
+    cd backend
+    npm run dev
+    
+### Start Frontend
 
-The app is deployed at:
+1.  ```bash
+    cd frontend
+    npm start
+
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5001/api
+
+---
+
+## Testing
+1. ```bash
+    cd backend
+    npm test
+- Uses Jest & Supertest
+- Tests are located in backend/tests/
+
+---
+
+## Deployment
+The application is deployed and live at:
+
+- Frontend (Client):
+https://full-event-booker.onrender.com
+- Backend (API):
 https://event-booker-weou.onrender.com
+
+---
+
+## Default Admin Account
+
+- **To log in as an administrator out of the box, use the following credentials:**
+
+  - Email: bas@gmail.com
+  - Password: 123456
+
 ___
 
-###Folder Structure
-
+## Folder Structure
+```bash
 event-booking-system/
 ├── backend/
 │   ├── src/
@@ -104,3 +135,5 @@ event-booking-system/
     │   └── api.js
     ├── public/
     └── package.json
+
+
