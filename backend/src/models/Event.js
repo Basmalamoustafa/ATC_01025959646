@@ -1,4 +1,3 @@
-// backend/src/models/Event.js
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
@@ -8,9 +7,8 @@ const eventSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   venue: String,
   price: { type: Number, required: true },
-  image: String,
-  tags: [String],
-  category: String
+  image: { type: mongoose.Schema.Types.ObjectId, ref: 'Image' }, // Reference to Image
+  tags: [String]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Event', eventSchema);

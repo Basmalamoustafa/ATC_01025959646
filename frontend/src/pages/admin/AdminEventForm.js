@@ -6,6 +6,8 @@ import { toast } from 'react-toastify';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
+
 const AdminEventForm = () => {
   const { t } = useTranslation();
   const { id } = useParams();
@@ -24,7 +26,10 @@ const AdminEventForm = () => {
       .then(res => setForm({
         ...res.data,
         date: res.data.date.slice(0, 16),
-        tags: Array.isArray(res.data.tags) ? res.data.tags.join(', ') : res.data.tags || ''
+        tags: Array.isArray(res.data.tags) ? res.data.tags.join(', ') : res.data.tags || '',
+        image: res.data.image && res.data.image._id
+          ? `${API_BASE_URL}/upload/image/${res.data.image._id}`
+          : ''
       }))
       .catch(() => toast.error(t('Failed to load event')))
       .finally(() => setLoading(false));
@@ -43,6 +48,11 @@ const AdminEventForm = () => {
         .split(',')
         .map(tg => tg.trim())
         .filter(Boolean);
+    }
+    // If image is a full URL, extract the imageId from the URL
+    if (submitForm.image && submitForm.image.startsWith(API_BASE_URL)) {
+      const match = submitForm.image.match(/\/api\/upload\/image\/([a-f\d]{24})/);
+      if (match) submitForm.image = match[1];
     }
     try {
       if (isEdit) {
@@ -76,7 +86,11 @@ const AdminEventForm = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      setForm(f => ({ ...f, image: res.data.imageUrl }));
+      // Set image as the API URL for preview, but store only the imageId on submit
+      setForm(f => ({
+        ...f,
+        image: `${API_BASE_URL}/upload/image/${res.data.imageId}`
+      }));
       toast.success(t('Image uploaded'));
     } catch (err) {
       toast.error(t('Image upload failed'));

@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import API from '../api';
 import { useTranslation } from 'react-i18next';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
+
 const MyBookings = () => {
   const { t } = useTranslation();
   const [bookings, setBookings] = useState([]);
@@ -51,6 +53,20 @@ const MyBookings = () => {
     }
   };
 
+  // Helper to get image URL from event.image (MongoDB)
+  const getImageUrl = (image) => {
+    if (!image) return '/placeholder.jpg';
+    if (typeof image === 'string') {
+      // If it's a full URL or relative path
+      if (image.startsWith('http') || image.startsWith('/upload')) return image;
+      // If it's a MongoDB ObjectId string
+      if (image.length === 24) return `${API_BASE_URL}/upload/image/${image}`;
+      return '/placeholder.jpg';
+    }
+    if (image._id) return `${API_BASE_URL}/upload/image/${image._id}`;
+    return '/placeholder.jpg';
+  };
+
   return (
     <Container className="mt-4">
       <h2 className="mb-4">{t('Your Bookings')}</h2>
@@ -89,9 +105,10 @@ const MyBookings = () => {
                 <Card>
                   <Card.Img
                     variant="top"
-                    src={booking.event.image}
+                    src={getImageUrl(booking.event.image)}
                     alt={booking.event.name}
                     style={{ height: '200px', objectFit: 'cover' }}
+                    onError={e => { e.target.onerror = null; e.target.src = '/placeholder.jpg'; }}
                   />
                   <Card.Body>
                     <Card.Title>{booking.event.name}</Card.Title>

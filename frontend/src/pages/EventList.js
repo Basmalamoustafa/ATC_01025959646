@@ -6,6 +6,9 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import Loader from '../components/Loader';
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
 
 const EventList = () => {
   const { t } = useTranslation();
@@ -113,7 +116,15 @@ const EventList = () => {
   // Detect dark mode by checking the body class
   const isDarkMode = document.body.classList.contains('dark-mode');
 
-  if (loading) return <Spinner animation="border" />;
+  // Helper to get image URL from event.image (MongoDB)
+  const getImageUrl = (image) => {
+    if (!image) return '/placeholder.jpg';
+    if (typeof image === 'string') return image; // fallback for old data
+    if (image._id) return `${API_BASE_URL}/upload/image/${image._id}`;
+    return '/placeholder.jpg';
+  };
+
+  if (loading) return <Loader />;
   if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
@@ -147,7 +158,7 @@ const EventList = () => {
                 >
                   <Card.Img
                     variant="top"
-                    src={evt.image}
+                    src={getImageUrl(evt.image)}
                     style={{ height: '180px', objectFit: 'cover' }}
                   />
                   <Card.Body>
@@ -218,7 +229,7 @@ const EventList = () => {
           {selectedEvent && (
             <>
               <img
-                src={selectedEvent.image}
+                src={getImageUrl(selectedEvent.image)}
                 alt={selectedEvent.name}
                 style={{ width: '100%', height: 200, objectFit: 'cover', marginBottom: 16 }}
               />
