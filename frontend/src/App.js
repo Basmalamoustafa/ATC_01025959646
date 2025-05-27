@@ -13,6 +13,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useDarkMode from './hooks/useDarkMode';
 import { useTranslation } from 'react-i18next';
+import Footer from './components/Footer';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useDarkMode();
@@ -50,6 +51,7 @@ function App() {
           <Route path="/admin/events/:id/edit" element={<AdminEventForm />} />
           <Route path="/congratulations" element={<Congratulations />} />
         </Routes>
+        <Footer /> 
       </div>
     </Router>
   );

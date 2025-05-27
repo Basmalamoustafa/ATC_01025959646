@@ -20,16 +20,38 @@ const EventList = () => {
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [categories, setCategories] = useState(['All']);
   const [showModal, setShowModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
 
+  // Fetch all categories for the dropdown (from backend, not just current page)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await API.get('/events/categories');
+        setCategories(['All', ...res.data]);
+      } catch (err) {
+        setCategories(['All']);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const eventRes = await API.get(`/events?page=${page}&limit=8`);
+        const params = {
+          page,
+          limit: 8,
+        };
+        if (selectedCategory && selectedCategory !== 'All') {
+          params.category = selectedCategory;
+        }
+        const eventRes = await API.get('/events', { params });
         setEvents(eventRes.data.events);
         setPages(eventRes.data.pages);
 
@@ -49,7 +71,7 @@ const EventList = () => {
     };
     fetchData();
     // eslint-disable-next-line
-  }, [token, page, t]);
+  }, [token, page, selectedCategory, t]);
 
   const handleBook = async (eventId) => {
     if (!token) {
@@ -95,13 +117,8 @@ const EventList = () => {
     return <Pagination>{items}</Pagination>;
   };
 
-  // Get unique categories
-  const uniqueCategories = ['All', ...new Set(events.map(e => e.category))];
-
-  // Filtered events based on selected category
-  const filteredEvents = selectedCategory === 'All'
-    ? events
-    : events.filter(e => e.category === selectedCategory);
+  // No need to filter events on the client, backend does it now
+  const filteredEvents = events;
 
   const handleCardClick = (evt) => {
     setSelectedEvent(evt);
@@ -134,9 +151,12 @@ const EventList = () => {
         <Form.Label>{t("Filter by Category")}</Form.Label>
         <Form.Select
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            setPage(1); // Reset to first page when filter changes
+          }}
         >
-          {uniqueCategories.map((cat, idx) => (
+          {categories.map((cat, idx) => (
             <option key={idx} value={cat}>{t(cat)}</option>
           ))}
         </Form.Select>
